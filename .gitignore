@@ -12,6 +12,7 @@ pids
 logs
 results
 backup
+images
 
 npm-debug.log
 node_modules
