@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "ngraph.graph": "^19.1.0",
-    "ngraph.todot": "^3.0.2"
+    "ngraph.todot": "^3.0.2",
+    "puppeteer": "^10.0.0"
   }
 }
