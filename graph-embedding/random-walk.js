@@ -3,15 +3,26 @@ module.exports.enumerateWalks = enumerateWalks;
 
 const createRandom = require('ngraph.random');
 
+/**
+ * Implements anonymous walk embedding (https://arxiv.org/abs/1805.11921 )
+ * counter.
+ * 
+ * @param {number} walkSize - how many steps the walker should take
+ * @param {ngraph.graph} graph - instance of the graph
+ * @param {string[]?} paths - optional array of all possible paths. Only used to improve performance 
+ * and can be left empty for default initialization.
+ * @returns number[] - vector of counts each walk appeared in the graph
+ */
 function getGraphEmbeddingRandomWalk(walkSize, graph, paths) {
   if (walkSize < 2 || walkSize > 8) throw new Error('Walk size is too large. Should be in [2, 8] interval');
   if (graph.getNodeCount() === 0) throw new Error('Graph is empty');
 
   let nu = [0, 0, 2, 5, 15, 52, 203, 877, 4000, 21000, 116000, 679000, 4000000];
   let eps = 0.1;    // Error more than epsilon
-  let delta = 0.01; // has probabilty smaller than delta
+  let delta = 0.01; // has probability smaller than delta
+
+  // Read more about this formula in the paper https://arxiv.org/abs/1805.11921
   let walkCount = Math.ceil(2*(Math.log(2)*nu[walkSize] - Math.log(delta)) /(eps**2));
-  // console.log('Will perform ' + walkCount + ' anonymous walks... ');
   let counts = [];
   if (!paths) paths = enumerateWalks(walkSize);
 
@@ -21,7 +32,6 @@ function getGraphEmbeddingRandomWalk(walkSize, graph, paths) {
     pathIndex.set(paths[i], i);
   }
 
-  // console.log('Indexing nodes');
   let nodes = [];
   let nodeToIndex = new Map();
   graph.forEachNode(node => {
@@ -41,7 +51,6 @@ function getGraphEmbeddingRandomWalk(walkSize, graph, paths) {
   
   let random = createRandom(42);
 
-  // console.log('Performing the walks');
   for (let i = 0; i < walkCount; ++i) {
     let startNode = random.next(nodes.length);
     let walkSignature = getWalkSignature(startNode);
@@ -53,7 +62,6 @@ function getGraphEmbeddingRandomWalk(walkSize, graph, paths) {
     counts[pathNumber] += 1;
   }
 
-//  console.log(counts);
   return counts;
 
   function getWalkSignature(startNodeNumber) {
