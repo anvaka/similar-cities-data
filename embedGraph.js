@@ -3,13 +3,14 @@ const {enumerateWalks} = require('./graph-embedding/random-walk');
 const randomWalk = require('./graph-embedding/random-walk');
 
 let candidates = [];
-let dataFolder = process.argv[2] || 'data';
+const inputFolder = process.argv[2] || 'data';
+const outputFolder = 'data-emb'
 const fs = require('fs');
 const path = require('path');
 
-fs.readdirSync(dataFolder).forEach(file => {
+fs.readdirSync(inputFolder).forEach(file => {
   if (file.endsWith('.pbf')) {
-    candidates.push(path.join(dataFolder, file));
+    candidates.push(path.join(inputFolder, file));
   }
 });
 let walkSize = 8;
@@ -18,7 +19,7 @@ let walkSize = 8;
 let paths = enumerateWalks(walkSize);
 
 candidates.forEach((x, index, arr) => {
-  const outName = 'data-emb/' + walkSize + '_' + path.basename(x);
+  const outName = path.join(outputFolder,  walkSize + '_' + path.basename(x));
   if (fs.existsSync(outName)) {
     return;
   }
